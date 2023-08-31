@@ -1,8 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+
 final _auth=FirebaseAuth.instance;
 void authWhithPhoneNumber(String phone ,
 {required Function (String value, int?value1)onCodeSend,
@@ -47,3 +47,16 @@ void enregistrerTexte(String texte) {
     print('Erreur lors de l\'enregistrement du texte : $error');
   });
 }
+Future<List<DocumentSnapshot>> getAppointments() async {
+  QuerySnapshot snapshot =
+      await FirebaseFirestore.instance.collection('appointments').get();
+  List<QueryDocumentSnapshot> documents = snapshot.docs;
+
+  // Triez les rendez-vous par ordre croissant de date
+  documents.sort((a, b) =>
+      (a['date'] as Timestamp).compareTo(b['date'] as Timestamp));
+
+  return documents;
+}
+
+ 

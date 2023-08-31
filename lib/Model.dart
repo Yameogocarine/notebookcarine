@@ -1,8 +1,8 @@
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:notebook/function.dart';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -14,11 +14,21 @@ class ImagePickerButton extends StatefulWidget {
 class _ImagePickerButtonState extends State<ImagePickerButton> {
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage(ImageSource source) async {
+   Future<void> _pickImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null) {
+        // Upload image to Firebase Storage
+        Reference storageReference = FirebaseStorage.instance.ref().child('images/${DateTime.now()}.jpg');
+        UploadTask uploadTask = storageReference.putFile(File(pickedFile.path));
+        TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() => null);
+
+        // Get image URL
+        String imageURL = await storageTaskSnapshot.ref.getDownloadURL();
+
+        // Save image URL to Firestore
+        await FirebaseFirestore.instance.collection('images').add({'imageURL': imageURL});
+        
         setState(() {
           _imageFile = File(pickedFile.path);
         });
@@ -41,17 +51,7 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
                 height: 200,
                 fit: BoxFit.cover,
               )
-           /* : Container(
-                width: 150,
-                height: 150,
-                color: Colors.grey,
-                child: Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: 50,
-                ),
-              ),
-        SizedBox(height: 16),*/
+           
        : Row(
         
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

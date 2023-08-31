@@ -12,63 +12,59 @@ class _CahierState extends State<Cahier> {
   String _searchQuery = '';
   @override
   Widget build(BuildContext context) {
-    return 
-    Scaffold(
-      appBar: AppBar(title: Text('Mon cahier de mesure ')),
-      
-      body: 
-StreamBuilder<QuerySnapshot>
-      ( stream: FirebaseFirestore.instance.collection('mensurations')
-      .where('nomPrenom', isGreaterThanOrEqualTo: _searchQuery)
-      .orderBy('nomPrenom')
-      .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Une erreur est survenue');
-                  }
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Mon cahier de mesure '),
+          backgroundColor: Colors.blue,
+        ),
+        backgroundColor: Color.fromARGB(255, 212, 153, 4),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('mensurations')
+              .where('nomPrenom', isGreaterThanOrEqualTo: _searchQuery)
+              .orderBy('nomPrenom')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Une erreur est survenue');
+            }
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
 
-                  final mensurations = snapshot.data!.docs;
-                  return ListView.builder(
-        itemCount: mensurations.length,
-        itemBuilder: (context, index) {
-        final mensuration = mensurations[index].data() as Map<String, dynamic>;
-        final nomPrenom = mensuration['nomPrenom'];
+            final mensurations = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: mensurations.length,
+              itemBuilder: (context, index) {
+                final mensuration =
+                    mensurations[index].data() as Map<String, dynamic>;
+                final nomPrenom = mensuration['nomPrenom'];
 
-        return ListTile(
-          title: Text(nomPrenom), // Afficher le nom d'utilisateur
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserDetailsPage(mensurationDocument: mensuration),
-              ),
+                return ListTile(
+                  title: Text(nomPrenom), // Afficher le nom d'utilisateur
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UserDetailsPage(mensurationDocument: mensuration),
+                      ),
+                    );
+                  },
+                );
+              },
             );
           },
-        );
-      },
-    );
-  },
-)
-  
- );
-  
-    
+        ));
   }
-   }
+}
 
-                  
-        
-       
-             
 class UserDetailsPage extends StatelessWidget {
   final Map<String, dynamic> mensurationDocument;
 
   UserDetailsPage({required this.mensurationDocument});
-  
+
   @override
   Widget build(BuildContext context) {
     final nomPrenom = mensurationDocument['nomPrenom'];
@@ -86,8 +82,9 @@ class UserDetailsPage extends StatelessWidget {
     final cuisse = mensurationDocument['cuisse'];
     final longJupe = mensurationDocument['longJupe'];
     final longPantalon = mensurationDocument['longPantalon'];
+    final String selectedDate = mensurationDocument['selectedDate'];
+    final String currentDate= mensurationDocument['currentDate'];
     
-
 
     return Scaffold(
       appBar: AppBar(
@@ -98,21 +95,24 @@ class UserDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Text('-NomPrenom: $nomPrenom'),
-          Text ('-Numero: $numero ' ) ,
-          Text('-Dos: $dos'),
-          Text ('-Epaule: $epaule ' ) ,
-          Text('-Poitrine: $poitrine'),
-          Text('-LongManche : $longManche '),
-          Text ('-TourManche: $tourManche ' ) ,
-          Text('-LongTaille: $longTaille'),
-          Text ('-LongRobe: $longRobe ' ) ,
-          Text('-longChemise: $longChemise'),
-          Text('-Ceinture: $ceinture'),
-          Text ('-Basin: $basin ' ) ,
-          Text('-Cuisse: $cuisse'),
-          Text ('-LongJupe: $longJupe ' ) ,
-          Text('-longPantalon: $longPantalon')
+            Text('-NomPrenom: $nomPrenom'),
+            Text('-Numero: $numero '),
+            Text('-Dos: $dos'),
+            Text('-Epaule: $epaule '),
+            Text('-Poitrine: $poitrine'),
+            Text('-LongManche : $longManche '),
+            Text('-TourManche: $tourManche '),
+            Text('-LongTaille: $longTaille'),
+            Text('-LongRobe: $longRobe '),
+            Text('-longChemise: $longChemise'),
+            Text('-Ceinture: $ceinture'),
+            Text('-Basin: $basin '),
+            Text('-Cuisse: $cuisse'),
+            Text('-LongJupe: $longJupe '),
+            Text('-longPantalon: $longPantalon'),
+            Text('-Date: $selectedDate'),
+            Text('-Date du jour: $currentDate'),
+
             // Personnalisez l'affichage en fonction de vos besoins
 
             // Ajoutez d'autres données ici en fonction de votre modèle
@@ -122,4 +122,4 @@ class UserDetailsPage extends StatelessWidget {
     );
   }
 }
- 
+
